@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAT1260 Formula Sheet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        header {
+            background-color: #6a0dad; /* Purple */
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 5px solid #b8860b; /* Dark Goldenrod border */
+            margin-bottom: 20px;
+        }
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            color: #6a0dad;
+        }
+        p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+    <!-- MathJax for rendering LaTeX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body>
+
+<header>
+    <h1>MAT1260 Formula Sheet</h1>
+</header>
+
+<div class="content">
+
+<h2>Descriptive Statistics</h2>
+<ul>
+    <li>Relative frequency: frequency / (sum of all frequencies)</li>
+    <li>Class midpoint: \((\text{lower class limit}_i + \text{lower class limit}_{i+1}) / 2\)</li>
+    <li>Mean: \(\bar{x} = \frac{\sum x_i}{n}\)</li>
+    <li>Population standard deviation: \(\sigma = \sqrt{\frac{\sum (x_i - \mu)^2}{N}}\)</li>
+    <li>Sample standard deviation: \(s = \sqrt{\frac{\sum (x_i - \bar{x})^2}{n-1}}\)</li>
+    <li>Population variance: \(\sigma^2 = \text{Var.P(numbers)}\)</li>
+    <li>Sample variance: \(s^2 = \text{Var.S(numbers)}\)</li>
+</ul>
+
+<h2>Z-scores and Quartiles</h2>
+<ul>
+    <li>Z-score: \(z = \frac{x - \mu}{\sigma}\)</li>
+    <li>Find \(x\) from \(z\): \(x = \mu + z \sigma\)</li>
+    <li>Quartiles: \(Q_1 = \text{QUARTILE.INC(numbers,1)}, Q_2 = \text{QUARTILE.INC(numbers,2)}, Q_3 = \text{QUARTILE.INC(numbers,3)}\)</li>
+    <li>IQR: \(\text{IQR} = Q_3 - Q_1\)</li>
+    <li>Fences: \(\text{Lower fence} = Q_1 - 1.5 \cdot \text{IQR}, \text{Upper fence} = Q_3 + 1.5 \cdot \text{IQR}\)</li>
+    <li>Five-number summary: Min, Q1, Q2, Q3, Max</li>
+</ul>
+
+<h2>Correlation and Regression</h2>
+<ul>
+    <li>Correlation coefficient: \(r = \text{CORREL(array1, array2)}\)</li>
+    <li>Regression line: \(y = mx + b\)</li>
+    <li>Slope: \(m = \text{SLOPE(ys,xs)}\)</li>
+    <li>Intercept: \(b = \text{INTERCEPT(ys,xs)}\)</li>
+    <li>Residual: \(\text{Residual} = \text{Observed value} - \text{Predicted value}\)</li>
+</ul>
+
+<h2>Probability Rules</h2>
+<ul>
+    <li>General Addition Rule: \(P(A \text{ or } B) = P(A) + P(B) - P(A \text{ and } B)\)</li>
+    <li>Complement Rule: \(P(A^c) = 1 - P(A)\)</li>
+    <li>Multiplication Rule: \(P(A \text{ and } B) = P(A) \cdot P(B|A)\)</li>
+    <li>Conditional Probability: \(P(A|B) = \frac{P(A \text{ and } B)}{P(B)}\)</li>
+</ul>
+
+<h2>Binomial Distribution</h2>
+<ul>
+    <li>Mean: \(\mu_{bi} = n \cdot p\)</li>
+    <li>Standard deviation: \(\sigma_{bi} = \sqrt{n \cdot p \cdot (1-p)}\)</li>
+    <li>Excel: <code>BINOM.DIST(x, trials, probability, FALSE)</code></li>
+</ul>
+
+<h2>Normal Distribution</h2>
+<ul>
+    <li>Area to the left: \(P(X \le x) = \text{NORM.DIST}(x, \text{mean}, \text{sd}, \text{TRUE})\)</li>
+    <li>Area to the right: \(P(X > x) = 1 - \text{NORM.DIST}(x, \text{mean}, \text{sd}, \text{TRUE})\)</li>
+    <li>Area between: \(P(a \le X \le b) = \text{NORM.DIST}(b, \text{mean}, \text{sd}, \text{TRUE}) - \text{NORM.DIST}(a, \text{mean}, \text{sd}, \text{TRUE})\)</li>
+    <li>Given percentile, find number: \(x = \text{NORM.INV}(\text{area}, \text{mean}, \text{sd})\)</li>
+</ul>
+
+<h2>Sampling Distributions</h2>
+<ul>
+    <li>Sample mean: \(\mu_{\bar{x}} = \mu\)</li>
+    <li>Std dev of sample mean: \(\sigma_{\bar{x}} = \frac{\sigma}{\sqrt{n}}\)</li>
+    <li>Sample proportion: \(\hat{p} = \frac{x}{n}\)</li>
+    <li>Mean of sample proportion: \(\mu_{\hat{p}} = p\)</li>
+    <li>Std dev of sample proportion: \(\sigma_{\hat{p}} = \sqrt{\frac{p(1-p)}{n}}\)</li>
+</ul>
+
+</div>
+
+<footer style="text-align:center; margin-top: 30px; color:#555;">
+    <p>&copy; 2026 Your Name</p>
+</footer>
+
+</body>
+</html>
