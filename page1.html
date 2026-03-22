@@ -5,11 +5,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAT1260 Normal Distribution</title>
 <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; line-height: 1.8; }
-    nav ul { list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; gap: 15px; }
-    nav a { text-decoration: none; color: #6a0dad; font-weight: bold; }
-    header { background-color: #6a0dad; color: #fff; padding: 15px 0; text-align: center; border-bottom: 5px solid #b8860b; margin-bottom: 25px; }
-    .content { max-width: 900px; margin: 0 auto; }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        line-height: 1.8;
+        display: flex;
+    }
+
+    /* Sidebar navigation */
+    nav {
+        width: 220px;
+        background-color: #6a0dad; /* Purple */
+        color: #ffd700; /* Gold text */
+        min-height: 100vh;
+        padding-top: 20px;
+        position: fixed;
+        left: 0;
+        top: 0;
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    nav li {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    nav a {
+        color: #ffd700;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 18px;
+        display: block;
+        padding: 10px 0;
+        transition: background 0.3s;
+    }
+
+    nav a:hover {
+        background-color: #b8860b; /* Dark golden highlight */
+        color: #fff;
+    }
+
+    /* Main content */
+    .content {
+        margin-left: 240px; /* space for sidebar */
+        padding: 20px;
+        max-width: 900px;
+    }
+
+    header {
+        background-color: #6a0dad;
+        color: #fff;
+        padding: 15px 0;
+        text-align: center;
+        border-bottom: 5px solid #b8860b;
+        margin-bottom: 25px;
+    }
+
     canvas { border: 1px solid #ccc; margin-top: 20px; margin-bottom: 10px; }
     input[type="number"] { width: 60px; font-size: 16px; margin-left: 5px; }
     .area-display { font-weight: bold; font-size: 16px; margin-bottom: 10px; color: #6a0dad; }
@@ -26,11 +83,11 @@
     </ul>
 </nav>
 
+<div class="content">
 <header>
     <h1>Normal Distribution Interactive Curve</h1>
 </header>
 
-<div class="content">
 <h3>Interactive Normal Curve</h3>
 
 <div class="controls">
@@ -53,17 +110,12 @@ const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
 
-// Standard normal PDF
 function normalPDF(x, mu=0, sigma=1) {
     return (1/(sigma*Math.sqrt(2*Math.PI))) * Math.exp(-0.5*Math.pow((x-mu)/sigma,2));
 }
 
-// Standard normal CDF approximation
-function normalCDF(z) {
-    return 0.5 * (1 + erf(z/Math.sqrt(2)));
-}
+function normalCDF(z) { return 0.5 * (1 + erf(z/Math.sqrt(2))); }
 
-// Error function approximation
 function erf(x) {
     const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
     const sign = x>=0 ? 1 : -1;
@@ -73,7 +125,6 @@ function erf(x) {
     return sign*y;
 }
 
-// Pixel conversion
 function xToPixel(x, minX=-4, maxX=4) { return (x - minX)/(maxX - minX) * width; }
 function yToPixel(y, scale=1.5) { return height - y*height*scale; }
 
@@ -83,41 +134,35 @@ function drawNormal(probType, z1, z2=null) {
 
     // Axes
     ctx.beginPath();
-    ctx.moveTo(0,height); ctx.lineTo(width,height); // x-axis
-    ctx.moveTo(50,0); ctx.lineTo(50,height); // y-axis
+    ctx.moveTo(0,height); ctx.lineTo(width,height);
+    ctx.moveTo(50,0); ctx.lineTo(50,height);
     ctx.strokeStyle = "#333"; ctx.lineWidth = 2; ctx.stroke();
 
-    // Determine shading range
     let startX, endX;
-    if(probType==='left'){ startX = -4; endX = z1; }
-    if(probType==='right'){ startX = z1; endX = 4; }
-    if(probType==='between'){ startX = z1; endX = z2; }
+    if(probType==='left'){ startX=-4; endX=z1; }
+    if(probType==='right'){ startX=z1; endX=4; }
+    if(probType==='between'){ startX=z1; endX=z2; }
 
-    // Draw shaded area under curve
     ctx.beginPath();
-    ctx.moveTo(xToPixel(startX), height); // bottom-left
-    for(let x = startX; x <= endX; x += step){
+    ctx.moveTo(xToPixel(startX), height);
+    for(let x=startX; x<=endX; x+=step){
         const y = normalPDF(x);
         ctx.lineTo(xToPixel(x), yToPixel(y));
     }
-    ctx.lineTo(xToPixel(endX), height); // bottom-right
+    ctx.lineTo(xToPixel(endX), height);
     ctx.closePath();
     ctx.fillStyle = "rgba(106,13,173,0.3)";
     ctx.fill();
 
-    // Draw normal curve
     ctx.beginPath();
     for(let x=-4; x<=4; x+=step){
         const y = normalPDF(x);
-        const px = xToPixel(x);
-        const py = yToPixel(y);
-        if(x===-4) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        if(x===-4) ctx.moveTo(xToPixel(x), yToPixel(y)); else ctx.lineTo(xToPixel(x), yToPixel(y));
     }
     ctx.strokeStyle = "#6a0dad";
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    // Draw z lines
     ctx.strokeStyle = "blue"; ctx.lineWidth = 2;
     ctx.fillStyle = "blue"; ctx.font="16px Arial"; ctx.textAlign="center";
 
@@ -136,7 +181,6 @@ function drawNormal(probType, z1, z2=null) {
         ctx.fillText("z2 = " + z2, xToPixel(z2), yToPixel(normalPDF(z2))-10);
     }
 
-    // Area display
     let area;
     if(probType==='left') area = normalCDF(z1);
     if(probType==='right') area = 1 - normalCDF(z1);
@@ -144,7 +188,6 @@ function drawNormal(probType, z1, z2=null) {
     document.getElementById("areaDisplay").innerText = "P(X " + (probType==='left'? "≤":"≥") + " z) = " + area.toFixed(4);
 }
 
-// Elements
 const z1Input = document.getElementById("z1Input");
 const z2Input = document.getElementById("z2Input");
 const z2Label = document.getElementById("z2Label");
@@ -158,12 +201,10 @@ function update() {
     drawNormal(probType, z1, z2);
 }
 
-// Event listeners
 z1Input.addEventListener("input", update);
 z2Input.addEventListener("input", update);
 radios.forEach(r => r.addEventListener("change", update));
 
-// Initial draw
 update();
 </script>
 
