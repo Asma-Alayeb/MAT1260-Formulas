@@ -3,110 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAT1260 Normal Distribution</title>
+<title>Interactive Normal Distribution</title>
 
 <style>
     body {
         font-family: Arial, sans-serif;
         background-color: #f4f4f4;
         margin: 0;
-        color: #333;
         line-height: 1.8;
+        display: flex;
     }
 
-    /* Sidebar */
     nav {
         width: 220px;
         background-color: #6a0dad;
         color: #ffd700;
+        min-height: 100vh;
+        padding-top: 20px;
         position: fixed;
-        height: 100%;
-        top: 0;
-        left: 0;
-        padding-top: 10px;
-        display: flex;
-        flex-direction: column;
     }
 
-    .nav-header {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-        padding: 15px 10px;
-        border-bottom: 2px solid #b8860b;
-    }
-
-    nav ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+    nav ul { list-style: none; padding: 0; margin: 0; }
+    nav li { text-align: center; margin-bottom: 20px; }
 
     nav a {
-        display: block;
         color: #ffd700;
-        padding: 12px 20px;
         text-decoration: none;
         font-weight: bold;
+        display: block;
+        padding: 10px;
     }
 
     nav a:hover {
         background-color: #b8860b;
-        color: white;
+        color: #fff;
     }
 
-    /* Header */
+    .content {
+        margin-left: 240px;
+        padding: 20px;
+        max-width: 900px;
+    }
+
     header {
         background-color: #6a0dad;
         color: white;
         text-align: center;
         padding: 15px;
         border-bottom: 5px solid #b8860b;
-        margin-left: 220px;
-        width: calc(100% - 220px);
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
-
-    /* Content */
-    .main-content {
-        margin-left: 220px;
-        padding: 25px;
-        max-width: 900px;
-    }
-
-    canvas {
-        border: 1px solid #ccc;
-        margin-top: 20px;
-    }
-
-    input {
-        width: 80px;
-        margin: 5px;
-    }
-
-    .calculator {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
         margin-bottom: 20px;
-        max-width: 300px;
     }
+
+    canvas { border: 1px solid #ccc; margin-top: 10px; }
+
+    input[type="number"] { width: 70px; margin-left: 5px; }
+
+    .controls { margin-bottom: 10px; }
 
     .area-display {
         font-weight: bold;
         color: #6a0dad;
         margin-top: 10px;
-    }
-
-    footer {
-        text-align: center;
-        margin-top: 40px;
-        padding-top: 10px;
-        border-top: 1px solid #ccc;
-        color: #555;
     }
 </style>
 
@@ -116,34 +73,49 @@
 <body>
 
 <nav>
-    <div class="nav-header">MAT1260</div>
     <ul>
         <li><a href="index.html">Statistics Formulas</a></li>
         <li><a href="page1.html">Interactive Normal Distribution</a></li>
     </ul>
 </nav>
 
+<div class="content">
+
 <header>
-    <h1>Normal Distribution Interactive Curve</h1>
+    <h1>Interactive Normal Distribution</h1>
 </header>
 
-<div class="main-content">
+<h3>Find Probability Using z-score</h3>
 
-<!-- Z SCORE CALCULATOR (NOW ABOVE CURVE) -->
-<div class="calculator">
-    <h3>Z-Score Calculator</h3>
-    <label>X: <input type="number" id="xVal"></label><br>
-    <label>Mean (μ): <input type="number" id="meanVal"></label><br>
-    <label>SD (σ): <input type="number" id="sdVal"></label><br><br>
-    <button onclick="calcZ()">Compute</button>
-    <p id="zResult"></p>
+<!-- NEW SECTION (before curve) -->
+<div class="controls">
+    <label><input type="radio" name="probType" value="left" checked> Left of z</label>
+    <label><input type="radio" name="probType" value="right"> Right of z</label>
+    <label><input type="radio" name="probType" value="between"> Between z1 & z2</label>
 </div>
 
-<!-- ORIGINAL NORMAL CURVE -->
+<div class="controls">
+    <label>z1: <input type="number" id="z1Input" value="1" step="0.01"></label>
+    <label id="z2Label" style="display:none;">
+        z2: <input type="number" id="z2Input" value="2" step="0.01">
+    </label>
+</div>
+
 <div class="area-display" id="areaDisplay">P(X ≤ z) = 0.8413</div>
+
 <canvas id="normalCanvas" width="600" height="300"></canvas>
 
+<hr>
+
+<h3>Z-Score Calculator</h3>
+
+<div class="controls">
+    <label>x: <input type="number" id="xInput" value="0"></label>
+    <label>μ: <input type="number" id="meanInput" value="0"></label>
+    <label>σ: <input type="number" id="sdInput" value="1"></label>
 </div>
+
+<div class="area-display" id="zResult">z = 0.0000</div>
 
 <script>
 const canvas = document.getElementById("normalCanvas");
@@ -155,46 +127,106 @@ function normalPDF(x) {
     return (1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*x*x);
 }
 
-function xToPixel(x) { return (x + 4) / 8 * width; }
-function yToPixel(y) { return height - y * height * 1.5; }
+function normalCDF(z) {
+    return 0.5 * (1 + erf(z/Math.sqrt(2)));
+}
 
-function drawCurve(){
+function erf(x) {
+    const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+    const sign = x>=0 ? 1 : -1;
+    x = Math.abs(x);
+    const t = 1/(1+p*x);
+    const y = 1 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
+    return sign*y;
+}
+
+function xToPixel(x) { return (x + 4)/8 * width; }
+function yToPixel(y) { return height - y*height*1.5; }
+
+function drawNormal(type, z1, z2) {
     ctx.clearRect(0,0,width,height);
+    const step = 0.01;
+
+    let startX, endX;
+    if(type==='left'){ startX=-4; endX=z1; }
+    if(type==='right'){ startX=z1; endX=4; }
+    if(type==='between'){ startX=z1; endX=z2; }
+
+    // shading
+    ctx.beginPath();
+    ctx.moveTo(xToPixel(startX), height);
+    for(let x=startX; x<=endX; x+=step){
+        ctx.lineTo(xToPixel(x), yToPixel(normalPDF(x)));
+    }
+    ctx.lineTo(xToPixel(endX), height);
+    ctx.closePath();
+    ctx.fillStyle="rgba(106,13,173,0.3)";
+    ctx.fill();
 
     // curve
     ctx.beginPath();
-    for(let x=-4; x<=4; x+=0.01){
-        let px = xToPixel(x);
-        let py = yToPixel(normalPDF(x));
-        if(x===-4) ctx.moveTo(px,py);
-        else ctx.lineTo(px,py);
+    for(let x=-4; x<=4; x+=step){
+        const y = normalPDF(x);
+        if(x===-4) ctx.moveTo(xToPixel(x), yToPixel(y));
+        else ctx.lineTo(xToPixel(x), yToPixel(y));
     }
     ctx.strokeStyle="#6a0dad";
     ctx.lineWidth=3;
     ctx.stroke();
+
+    // probability
+    let area;
+    if(type==='left') area = normalCDF(z1);
+    if(type==='right') area = 1 - normalCDF(z1);
+    if(type==='between') area = normalCDF(z2) - normalCDF(z1);
+
+    document.getElementById("areaDisplay").innerText =
+        "P = " + area.toFixed(4);
 }
 
-drawCurve();
+// update graph
+function update() {
+    const type = document.querySelector('input[name="probType"]:checked').value;
+    document.getElementById("z2Label").style.display = (type==='between') ? "inline" : "none";
 
-/* Z SCORE CALCULATOR */
-function calcZ(){
-    let x = parseFloat(document.getElementById("xVal").value);
-    let mean = parseFloat(document.getElementById("meanVal").value);
-    let sd = parseFloat(document.getElementById("sdVal").value);
+    const z1 = parseFloat(document.getElementById("z1Input").value);
+    const z2 = parseFloat(document.getElementById("z2Input").value);
 
-    if(isNaN(x)||isNaN(mean)||isNaN(sd)||sd===0){
-        document.getElementById("zResult").innerText="Enter valid values";
+    drawNormal(type, z1, z2);
+}
+
+document.querySelectorAll('input[name="probType"]').forEach(r=>r.addEventListener("change", update));
+document.getElementById("z1Input").addEventListener("input", update);
+document.getElementById("z2Input").addEventListener("input", update);
+
+update();
+
+// Z-score calculator
+function updateZ() {
+    const x = parseFloat(document.getElementById("xInput").value);
+    const mean = parseFloat(document.getElementById("meanInput").value);
+    const sd = parseFloat(document.getElementById("sdInput").value);
+
+    if(sd===0){
+        document.getElementById("zResult").innerText="σ cannot be 0";
         return;
     }
 
-    let z = (x-mean)/sd;
-    document.getElementById("zResult").innerText="z = " + z.toFixed(3);
+    const z = (x-mean)/sd;
+    document.getElementById("zResult").innerText = "z = " + z.toFixed(4);
 }
+
+document.getElementById("xInput").addEventListener("input", updateZ);
+document.getElementById("meanInput").addEventListener("input", updateZ);
+document.getElementById("sdInput").addEventListener("input", updateZ);
+
+updateZ();
 </script>
 
-<footer>
+<footer style="text-align:center; margin-top:30px; color:#555;">
     <p>&copy; 2026 Asma Alayeb</p>
 </footer>
 
+</div>
 </body>
 </html>
