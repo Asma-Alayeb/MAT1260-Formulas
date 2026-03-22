@@ -64,13 +64,10 @@ header {
     padding: 15px 0;
     text-align: center;
     border-bottom: 5px solid #b8860b;
-
     position: sticky;
     top: 0;
     z-index: 1000;
-
-    width: 100%; /* span full width, flush with sidebar */
-    margin-left: 0; /* remove margin */
+    width: calc(100% - 220px);
 }
 
 .flex-container {
@@ -83,10 +80,18 @@ header {
 .left-panel {
     flex: 1;
     min-width: 200px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
 .right-panel {
     flex: 2;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
 /* Controls */
@@ -98,6 +103,9 @@ input[type="number"] {
     width: 70px;
     font-size: 16px;
     margin-left: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 4px;
 }
 
 button {
@@ -107,7 +115,7 @@ button {
     background-color: #6a0dad;
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
 }
 
@@ -145,7 +153,6 @@ footer {
 <nav>
     <ul>
         <li><a href="index.html">Statistics Formulas</a></li>
-       
     </ul>
 </nav>
 
@@ -191,12 +198,12 @@ footer {
 </footer>
 
 <script>
+// Normal functions
 const canvas = document.getElementById("normalCanvas");
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
 
-// Normal functions
 function normalPDF(x){ return (1/Math.sqrt(2*Math.PI))*Math.exp(-0.5*x*x);}
 function normalCDF(z){ return 0.5*(1 + erf(z/Math.sqrt(2))); }
 function erf(x){
@@ -292,6 +299,7 @@ document.getElementById("calcZ").addEventListener("click", function(){
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,"zResult"]);
 });
 </script>
+
 </div>
 </body>
 </html>
