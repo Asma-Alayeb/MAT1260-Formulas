@@ -8,8 +8,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     display: flex;
+    background-color: #f4f4f4;
 }
 
 /* Sidebar */
@@ -20,7 +20,7 @@ nav {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
+    bottom: 0;
     display: flex;
     flex-direction: column;
     padding-top: 20px;
@@ -28,22 +28,21 @@ nav {
 
 nav ul {
     list-style: none;
-    padding: 0;
     margin: 0;
-    flex-grow: 1;
+    padding: 0;
 }
 
 nav li {
-    margin: 0;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 nav a {
-    display: block;
-    padding: 15px 0;
-    color: #ffd700;
     text-decoration: none;
+    color: #ffd700;
     font-weight: bold;
+    display: block;
+    padding: 10px 0;
 }
 
 nav a:hover {
@@ -51,90 +50,79 @@ nav a:hover {
     color: #fff;
 }
 
+/* Header */
+header {
+    position: fixed;
+    left: 220px;
+    top: 0;
+    right: 0;
+    height: 60px;
+    background-color: #6a0dad;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border-bottom: 5px solid #b8860b;
+    z-index: 1000;
+}
+
 /* Content */
 .content {
     margin-left: 220px;
-    padding: 20px;
+    padding: 80px 20px 20px 20px;
     flex-grow: 1;
-}
-
-header {
-    background-color: #6a0dad;
-    color: #fff;
-    padding: 15px 0;
-    text-align: center;
-    border-bottom: 5px solid #b8860b;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    width: calc(100% - 220px);
 }
 
 .flex-container {
     display: flex;
     gap: 20px;
     align-items: flex-start;
-    margin-top: 20px;
 }
 
-.left-panel {
-    flex: 1;
-    min-width: 200px;
-    background-color: #fff;
+.left-panel, .right-panel {
+    background: #fff;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-.right-panel {
-    flex: 2;
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-}
+.left-panel { flex: 1; min-width: 220px; }
+.right-panel { flex: 2; }
 
 /* Controls */
-.controls {
-    margin-bottom: 15px;
-}
-
+.controls { margin-bottom: 15px; }
 input[type="number"] {
     width: 70px;
     font-size: 16px;
     margin-left: 5px;
-    border: 1px solid #ccc;
     border-radius: 4px;
+    border: 1px solid #ccc;
     padding: 2px 4px;
 }
-
 button {
     font-size: 16px;
     padding: 5px 10px;
     margin-top: 5px;
     background-color: #6a0dad;
     color: #fff;
-    border: none;
     border-radius: 4px;
+    border: none;
     cursor: pointer;
 }
-
-button:hover {
-    background-color: #b8860b;
-}
+button:hover { background-color: #b8860b; }
 
 canvas {
+    width: 100%;
+    max-width: 600px;
     border: 1px solid #ccc;
-    display: block;
-    margin-top: 15px;
-    max-width: 100%;
 }
 
 .area-display {
     font-weight: bold;
     font-size: 16px;
-    margin-bottom: 10px;
     color: #6a0dad;
+    margin-bottom: 10px;
 }
 
 footer {
@@ -146,6 +134,7 @@ footer {
 }
 </style>
 
+<!-- MathJax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
@@ -156,11 +145,9 @@ footer {
     </ul>
 </nav>
 
-<div class="content">
-<header>
-    <h1>Interactive Normal Distribution</h1>
-</header>
+<header>Interactive Normal Distribution</header>
 
+<div class="content">
 <div class="flex-container">
     <div class="left-panel">
         <h3>Z-Score Calculator</h3>
@@ -193,12 +180,11 @@ footer {
     </div>
 </div>
 
-<footer>
-    <p>&copy; 2026 Asma Alayeb</p>
-</footer>
+<footer>&copy; 2026 Asma Alayeb</footer>
+</div>
 
 <script>
-// Normal functions
+// Normal distribution functions
 const canvas = document.getElementById("normalCanvas");
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
@@ -208,11 +194,8 @@ function normalPDF(x){ return (1/Math.sqrt(2*Math.PI))*Math.exp(-0.5*x*x);}
 function normalCDF(z){ return 0.5*(1 + erf(z/Math.sqrt(2))); }
 function erf(x){
     const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
-    const sign = x>=0 ? 1 : -1;
-    x = Math.abs(x);
-    const t = 1/(1+p*x);
-    const y = 1 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
-    return sign*y;
+    const sign = x>=0?1:-1; x=Math.abs(x);
+    const t=1/(1+p*x); return sign*(1 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)));
 }
 
 function xToPixel(x){ return (x+4)/8*width; }
@@ -227,50 +210,46 @@ function drawNormal(probType, z1, z2=null){
     if(probType==='right'){ startX=z1; endX=4;}
     if(probType==='between'){ startX=z1; endX=z2;}
 
+    // shaded area
     ctx.beginPath();
     ctx.moveTo(xToPixel(startX), height);
     for(let x=startX;x<=endX;x+=step){ ctx.lineTo(xToPixel(x), yToPixel(normalPDF(x))); }
-    ctx.lineTo(xToPixel(endX), height);
-    ctx.closePath();
-    ctx.fillStyle="rgba(106,13,173,0.3)";
-    ctx.fill();
+    ctx.lineTo(xToPixel(endX), height); ctx.closePath();
+    ctx.fillStyle="rgba(106,13,173,0.3)"; ctx.fill();
 
     // curve
     ctx.beginPath();
     for(let x=-4;x<=4;x+=step){
-        const y=normalPDF(x);
+        const y = normalPDF(x);
         if(x===-4) ctx.moveTo(xToPixel(x), yToPixel(y));
         else ctx.lineTo(xToPixel(x), yToPixel(y));
     }
-    ctx.strokeStyle="#6a0dad";
-    ctx.lineWidth=3;
-    ctx.stroke();
+    ctx.strokeStyle="#6a0dad"; ctx.lineWidth=3; ctx.stroke();
 
     // annotations
-    ctx.fillStyle="#000";
-    ctx.font="14px Arial";
-    ctx.fillText("0 (mean)", xToPixel(0)-20, yToPixel(0)+15);
+    ctx.fillStyle="#000"; ctx.font="14px Arial";
+    ctx.fillText("0 (mean)", xToPixel(0)-25, yToPixel(0)+15);
     ctx.fillText("z₁", xToPixel(z1)-10, yToPixel(0)+15);
     if(probType==='between') ctx.fillText("z₂", xToPixel(z2)-10, yToPixel(0)+15);
 
-    // area text
+    // probability text
     let areaVal, areaText;
-    if(probType==='left'){ areaVal=normalCDF(z1); areaText=`P(X \\le z) = ${areaVal.toFixed(4)}`; }
-    if(probType==='right'){ areaVal=1-normalCDF(z1); areaText=`P(X \\ge z) = ${areaVal.toFixed(4)}`; }
-    if(probType==='between'){ areaVal=normalCDF(z2)-normalCDF(z1); areaText=`P(z_1 \\le X \\le z_2) = ${areaVal.toFixed(4)}`; }
+    if(probType==='left'){ areaVal = normalCDF(z1); areaText=`P(X \\le z) = ${areaVal.toFixed(4)}`; }
+    if(probType==='right'){ areaVal = 1-normalCDF(z1); areaText=`P(X \\ge z) = ${areaVal.toFixed(4)}`; }
+    if(probType==='between'){ areaVal = normalCDF(z2)-normalCDF(z1); areaText=`P(z_1 \\le X \\le z_2) = ${areaVal.toFixed(4)}`; }
 
-    document.getElementById("areaDisplay").innerHTML=`\\(${areaText}\\)`;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"areaDisplay"]);
+    document.getElementById("areaDisplay").innerHTML = `\\(${areaText}\\)`;
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, "areaDisplay"]);
 }
 
-// Inputs
-const z1Input=document.getElementById("z1Input");
-const z2Input=document.getElementById("z2Input");
-const z2Label=document.getElementById("z2Label");
+// update curve
+const z1Input = document.getElementById("z1Input");
+const z2Input = document.getElementById("z2Input");
+const z2Label = document.getElementById("z2Label");
 
 function updateCurve(){
-    const type=document.querySelector('input[name="probType"]:checked').value;
-    z2Label.style.display=(type==='between')?"inline":"none";
+    const type = document.querySelector('input[name="probType"]:checked').value;
+    z2Label.style.display = (type==='between')?"inline":"none";
     drawNormal(type, parseFloat(z1Input.value), parseFloat(z2Input.value));
 }
 
@@ -279,27 +258,18 @@ z2Input.addEventListener("input", updateCurve);
 document.querySelectorAll('input[name="probType"]').forEach(r=>r.addEventListener("change", updateCurve));
 updateCurve();
 
-// Z-score calculation
-document.getElementById("calcZ").addEventListener("click", function(){
+// z-score calculator
+document.getElementById("calcZ").addEventListener("click", ()=>{
     const x=parseFloat(document.getElementById("xInput").value);
     const mean=parseFloat(document.getElementById("meanInput").value);
     const sd=parseFloat(document.getElementById("sdInput").value);
-
     let zText;
-    if(isNaN(x)||isNaN(mean)||isNaN(sd)){
-        zText="\\( Input \\ invalid \\)";
-    } else if(sd===0){
-        zText="\\( \\sigma \\ cannot be 0 \\)";
-    } else {
-        const z=(x-mean)/sd;
-        zText=`\\( z = ${z.toFixed(4)} \\)`;
-    }
-
-    document.getElementById("zResult").innerHTML=zText;
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"zResult"]);
+    if(isNaN(x)||isNaN(mean)||isNaN(sd)) zText="\\( Input \\ invalid \\)";
+    else if(sd===0) zText="\\( \\sigma \\ cannot be 0 \\)";
+    else { const z=(x-mean)/sd; zText=`\\( z = ${z.toFixed(4)} \\)`; }
+    document.getElementById("zResult").innerHTML = zText;
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, "zResult"]);
 });
 </script>
-
-</div>
 </body>
 </html>
