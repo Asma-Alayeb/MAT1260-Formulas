@@ -4,72 +4,96 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive Normal Distribution</title>
-
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        line-height: 1.8;
-        display: flex;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    line-height: 1.8;
+    display: flex;
+}
 
-    nav {
-        width: 220px;
-        background-color: #6a0dad;
-        color: #ffd700;
-        min-height: 100vh;
-        padding-top: 20px;
-        position: fixed;
-    }
+/* Sidebar */
+nav {
+    width: 220px;
+    background-color: #6a0dad;
+    color: #ffd700;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding-top: 20px;
+}
 
-    nav ul { list-style: none; padding: 0; margin: 0; }
-    nav li { text-align: center; margin-bottom: 20px; }
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-    nav a {
-        color: #ffd700;
-        text-decoration: none;
-        font-weight: bold;
-        display: block;
-        padding: 10px;
-    }
+nav li {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-    nav a:hover {
-        background-color: #b8860b;
-        color: #fff;
-    }
+nav a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    display: block;
+    padding: 10px 0;
+}
 
-    .content {
-        margin-left: 240px;
-        padding: 20px;
-        max-width: 900px;
-    }
+nav a:hover {
+    background-color: #b8860b;
+    color: #fff;
+}
 
-    header {
-        background-color: #6a0dad;
-        color: white;
-        text-align: center;
-        padding: 15px;
-        border-bottom: 5px solid #b8860b;
-        margin-bottom: 20px;
-    }
+/* Content */
+.content {
+    margin-left: 220px;
+    padding: 20px;
+    flex-grow: 1;
+}
 
-    canvas { border: 1px solid #ccc; margin-top: 10px; }
+header {
+    background-color: #6a0dad;
+    color: #fff;
+    text-align: center;
+    padding: 15px 0;
+    border-bottom: 5px solid #b8860b;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
 
-    input[type="number"] { width: 70px; margin-left: 5px; }
+.controls {
+    margin-bottom: 10px;
+}
 
-    .controls { margin-bottom: 10px; }
+input[type="number"] {
+    width: 70px;
+    font-size: 16px;
+    margin-left: 5px;
+}
 
-    .area-display {
-        font-weight: bold;
-        color: #6a0dad;
-        margin-top: 10px;
-    }
+canvas {
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.area-display {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #6a0dad;
+}
+
 </style>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
-
 <body>
 
 <nav>
@@ -85,38 +109,35 @@
     <h1>Interactive Normal Distribution</h1>
 </header>
 
-<h3>Find Probability Using z-score</h3>
+<h3>Z-Score Calculator</h3>
+<div class="controls">
+    <label>\( x: <input type="number" id="xInput" value="0" step="0.1"> \)</label>
+    <label>\( \mu: <input type="number" id="meanInput" value="0" step="0.1"> \)</label>
+    <label>\( \sigma: <input type="number" id="sdInput" value="1" step="0.1"> \)</label>
+</div>
+<div class="area-display" id="zResult">z = 0.0000</div>
 
-<!-- Probability type -->
+<h3>Normal Curve</h3>
 <div class="controls">
     <label><input type="radio" name="probType" value="left" checked> Left of z</label>
     <label><input type="radio" name="probType" value="right"> Right of z</label>
     <label><input type="radio" name="probType" value="between"> Between z₁ & z₂</label>
 </div>
 
-<!-- z-value inputs -->
 <div class="controls">
     <label>\( z_1: <input type="number" id="z1Input" value="1" step="0.01"> \)</label>
     <label id="z2Label" style="display:none;">\( z_2: <input type="number" id="z2Input" value="2" step="0.01"> \)</label>
 </div>
 
-<div class="area-display" id="areaDisplay">P(X ≤ z) = 0.8413</div>
-
+<div class="area-display" id="areaDisplay">\( P(X \le z) = 0.8413 \)</div>
 <canvas id="normalCanvas" width="600" height="300"></canvas>
 
-<hr>
-
-<h3>Z-Score Calculator</h3>
-
-<div class="controls">
-    <label>\( x: <input type="number" id="xInput" value="0"> \)</label>
-    <label>\( \mu: <input type="number" id="meanInput" value="0"> \)</label>
-    <label>\( \sigma: <input type="number" id="sdInput" value="1"> \)</label>
-</div>
-
-<div class="area-display" id="zResult">z = 0.0000</div>
+<footer style="text-align:center; margin-top:30px; color:#555;">
+    <p>&copy; 2026 Asma Alayeb</p>
+</footer>
 
 <script>
+// Normal distribution functions
 const canvas = document.getElementById("normalCanvas");
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
@@ -142,18 +163,20 @@ function erf(x) {
 function xToPixel(x) { return (x + 4)/8 * width; }
 function yToPixel(y) { return height - y*height*1.5; }
 
-function drawNormal(type, z1, z2) {
+// Draw normal curve
+function drawNormal(probType, z1, z2=null){
     ctx.clearRect(0,0,width,height);
     const step = 0.01;
 
+    // shading
     let startX, endX;
-    if(type==='left'){ startX=-4; endX=z1; }
-    if(type==='right'){ startX=z1; endX=4; }
-    if(type==='between'){ startX=z1; endX=z2; }
+    if(probType==='left'){ startX=-4; endX=z1; }
+    if(probType==='right'){ startX=z1; endX=4; }
+    if(probType==='between'){ startX=z1; endX=z2; }
 
     ctx.beginPath();
     ctx.moveTo(xToPixel(startX), height);
-    for(let x=startX; x<=endX; x+=step){
+    for(let x=startX;x<=endX;x+=step){
         ctx.lineTo(xToPixel(x), yToPixel(normalPDF(x)));
     }
     ctx.lineTo(xToPixel(endX), height);
@@ -161,8 +184,9 @@ function drawNormal(type, z1, z2) {
     ctx.fillStyle="rgba(106,13,173,0.3)";
     ctx.fill();
 
+    // curve
     ctx.beginPath();
-    for(let x=-4; x<=4; x+=step){
+    for(let x=-4;x<=4;x+=step){
         const y = normalPDF(x);
         if(x===-4) ctx.moveTo(xToPixel(x), yToPixel(y));
         else ctx.lineTo(xToPixel(x), yToPixel(y));
@@ -171,55 +195,50 @@ function drawNormal(type, z1, z2) {
     ctx.lineWidth=3;
     ctx.stroke();
 
-    let area;
-    if(type==='left') area = normalCDF(z1);
-    if(type==='right') area = 1 - normalCDF(z1);
-    if(type==='between') area = normalCDF(z2) - normalCDF(z1);
+    // area display
+    let areaVal, areaText;
+    if(probType==='left'){ areaVal=normalCDF(z1); areaText=`P(X \\le z) = ${areaVal.toFixed(4)}`; }
+    if(probType==='right'){ areaVal=1-normalCDF(z1); areaText=`P(X \\ge z) = ${areaVal.toFixed(4)}`; }
+    if(probType==='between'){ areaVal=normalCDF(z2)-normalCDF(z1); areaText=`P(z_1 \\le X \\le z_2) = ${areaVal.toFixed(4)}`; }
 
-    document.getElementById("areaDisplay").innerText =
-        "P = " + area.toFixed(4);
+    document.getElementById("areaDisplay").innerHTML = "$" + areaText + "$";
+    MathJax.typesetPromise();
 }
 
-function update() {
+// Update inputs
+const z1Input = document.getElementById("z1Input");
+const z2Input = document.getElementById("z2Input");
+const z2Label = document.getElementById("z2Label");
+
+function updateCurve(){
     const type = document.querySelector('input[name="probType"]:checked').value;
-    document.getElementById("z2Label").style.display = (type==='between') ? "inline" : "none";
-
-    const z1 = parseFloat(document.getElementById("z1Input").value);
-    const z2 = parseFloat(document.getElementById("z2Input").value);
-
-    drawNormal(type, z1, z2);
+    z2Label.style.display = (type==='between')?"inline":"none";
+    drawNormal(type, parseFloat(z1Input.value), parseFloat(z2Input.value));
 }
 
-document.querySelectorAll('input[name="probType"]').forEach(r=>r.addEventListener("change", update));
-document.getElementById("z1Input").addEventListener("input", update);
-document.getElementById("z2Input").addEventListener("input", update);
+z1Input.addEventListener("input", updateCurve);
+z2Input.addEventListener("input", updateCurve);
+document.querySelectorAll('input[name="probType"]').forEach(r=>r.addEventListener("change", updateCurve));
+updateCurve();
 
-update();
-
-function updateZ() {
+// Z-score calculator
+function updateZ(){
     const x = parseFloat(document.getElementById("xInput").value);
     const mean = parseFloat(document.getElementById("meanInput").value);
     const sd = parseFloat(document.getElementById("sdInput").value);
 
-    if(sd===0){
-        document.getElementById("zResult").innerText="σ cannot be 0";
-        return;
-    }
+    if(sd===0){ document.getElementById("zResult").innerHTML="\\( \\sigma \\text{ cannot be 0} \\)"; MathJax.typesetPromise(); return; }
 
     const z = (x-mean)/sd;
-    document.getElementById("zResult").innerText = "z = " + z.toFixed(4);
+    document.getElementById("zResult").innerHTML = `\\( z = ${z.toFixed(4)} \\)`;
+    MathJax.typesetPromise();
 }
 
 document.getElementById("xInput").addEventListener("input", updateZ);
 document.getElementById("meanInput").addEventListener("input", updateZ);
 document.getElementById("sdInput").addEventListener("input", updateZ);
-
 updateZ();
 </script>
-
-<footer style="text-align:center; margin-top:30px; color:#555;">
-    <p>&copy; 2026 Asma Alayeb</p>
-</footer>
 
 </div>
 </body>
