@@ -249,7 +249,7 @@ function drawNormal(probType, z1, z2=null){
     if(probType==='between'){ areaVal=normalCDF(z2)-normalCDF(z1); areaText=`P(z_1 \\le X \\le z_2) = ${areaVal.toFixed(4)}`; }
 
     document.getElementById("areaDisplay").innerHTML=`\\(${areaText}\\)`;
-    MathJax.typesetPromise();
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"areaDisplay"]);
 }
 
 // Inputs
@@ -273,16 +273,21 @@ document.getElementById("calcZ").addEventListener("click", function(){
     const x=parseFloat(document.getElementById("xInput").value);
     const mean=parseFloat(document.getElementById("meanInput").value);
     const sd=parseFloat(document.getElementById("sdInput").value);
-    if(sd===0){
-        document.getElementById("zResult").innerHTML="\\( \\sigma \\text{ cannot be 0} \\)";
+
+    let zText;
+    if(isNaN(x)||isNaN(mean)||isNaN(sd)){
+        zText="\\( Input \\ invalid \\)";
+    } else if(sd===0){
+        zText="\\( \\sigma \\ cannot be 0 \\)";
     } else {
         const z=(x-mean)/sd;
-        document.getElementById("zResult").innerHTML=`\\( z = ${z.toFixed(4)} \\)`;
+        zText=`\\( z = ${z.toFixed(4)} \\)`;
     }
-    MathJax.typesetPromise();
+
+    document.getElementById("zResult").innerHTML=zText;
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,"zResult"]);
 });
 </script>
-
 </div>
 </body>
 </html>
