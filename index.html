@@ -5,15 +5,90 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAT1260 Formula Sheet</title>
 <style>
-    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; line-height: 1.8; }
-    header { background-color: #6a0dad; color: #fff; padding: 15px 0; text-align: center; border-bottom: 5px solid #b8860b; margin-bottom: 25px; }
-    nav ul { list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; gap: 15px; }
-    nav a { text-decoration: none; color: #6a0dad; font-weight: bold; }
-    .content { max-width: 900px; margin: 0 auto; }
-    h2 { font-size: 22px; margin-top: 25px; color: #6a0dad; }
-    ul { padding-left: 20px; }
-    li { margin-bottom: 15px; }
-    code { background-color: #eee; padding: 4px 8px; border-radius: 5px; font-size: 1.25em; font-family: Consolas, monospace; }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        color: #333;
+        line-height: 1.8;
+        display: flex;
+    }
+
+    /* Sidebar navigation */
+    nav {
+        width: 220px;
+        background-color: #6a0dad; /* Purple */
+        color: #ffd700; /* Gold */
+        min-height: 100vh;
+        padding-top: 20px;
+        position: fixed;
+        left: 0;
+        top: 0;
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    nav li {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    nav a {
+        color: #ffd700; /* Gold text */
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 18px;
+        display: block;
+        padding: 10px 0;
+        transition: background 0.3s;
+    }
+
+    nav a:hover {
+        background-color: #b8860b; /* Dark Goldenrod highlight */
+        color: #fff;
+    }
+
+    /* Main content */
+    .content {
+        margin-left: 240px; /* Space for sidebar */
+        padding: 20px;
+        max-width: 900px;
+    }
+
+    header {
+        background-color: #6a0dad;
+        color: #fff;
+        padding: 15px 0;
+        text-align: center;
+        border-bottom: 5px solid #b8860b;
+        margin-bottom: 25px;
+    }
+
+    h2 {
+        font-size: 22px;
+        margin-top: 25px;
+        color: #6a0dad;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 15px;
+    }
+
+    code {
+        background-color: #eee;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 1.25em;
+        font-family: Consolas, monospace;
+    }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
@@ -26,11 +101,10 @@
     </ul>
 </nav>
 
+<div class="content">
 <header>
     <h1>MAT1260 Formula Sheet</h1>
 </header>
-
-<div class="content">
 
 <h2>Descriptive Statistics</h2>
 <ul>
@@ -62,7 +136,7 @@
 <h2>Probability Rules</h2>
 <ul>
     <li>General Addition: \(P(A \text{ or } B) = P(A) + P(B) - P(A \text{ and } B)\)</li>
-    <li>Complement: \(P(A^c) = 1 - P(A)\)</li>
+    <li>Complement: \(P(A^c) = 1 - P(A)\li>
     <li>Multiplication: \(P(A \text{ and } B) = P(A) \cdot P(B|A)\)</li>
     <li>Conditional: \(P(A|B) = \frac{P(A \text{ and } B)}{P(B)}\)</li>
 </ul>
@@ -81,6 +155,7 @@
     <li>Between: <code>=NORM.DIST(b,Mean,SD,TRUE)-NORM.DIST(a,Mean,SD,TRUE)</code></li>
     <li>Inverse: <code>=NORM.INV(area, Mean, SD)</code></li>
 </ul>
+
 <h2>Sampling Distributions</h2>
 <ul>
     <li>Sample mean: <br>\(\mu_{\bar{x}} = \mu\)</li>
@@ -89,6 +164,7 @@
     <li>Mean of sample proportion: <br>\(\mu_{\hat{p}} = p\)</li>
     <li>Standard deviation of sample proportion: <br>\(\sigma_{\hat{p}} = \sqrt{\frac{p(1-p)}{n}}\)</li>
 </ul>
+
 <footer style="text-align:center; margin-top: 30px; color:#555;">
     <p>&copy; 2026 Asma Alayeb</p>
 </footer>
