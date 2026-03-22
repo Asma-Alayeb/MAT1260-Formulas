@@ -70,6 +70,23 @@ header {
     z-index: 1000;
 }
 
+.flex-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.left-panel {
+    flex: 1;
+    min-width: 200px;
+}
+
+.right-panel {
+    flex: 2;
+}
+
+/* Controls */
 .controls {
     margin-bottom: 15px;
 }
@@ -82,9 +99,9 @@ input[type="number"] {
 
 canvas {
     border: 1px solid #ccc;
-    margin-top: 15px;
-    margin-bottom: 10px;
     display: block;
+    margin-top: 15px;
+    max-width: 100%;
 }
 
 .area-display {
@@ -120,28 +137,39 @@ footer {
     <h1>Interactive Normal Distribution</h1>
 </header>
 
-<h3>Z-Score Calculator</h3>
-<div class="controls">
-    <label>\( x: <input type="number" id="xInput" value="0" step="0.1"> \)</label>
-    <label>\( \mu: <input type="number" id="meanInput" value="0" step="0.1"> \)</label>
-    <label>\( \sigma: <input type="number" id="sdInput" value="1" step="0.1"> \)</label>
-</div>
-<div class="area-display" id="zResult">\( z = 0.0000 \)</div>
+<div class="flex-container">
 
-<h3>Normal Curve</h3>
-<div class="controls">
-    <label><input type="radio" name="probType" value="left" checked> Left of z</label>
-    <label><input type="radio" name="probType" value="right"> Right of z</label>
-    <label><input type="radio" name="probType" value="between"> Between z₁ & z₂</label>
-</div>
+    <!-- Z-score calculator on the left -->
+    <div class="left-panel">
+        <h3>Z-Score Calculator</h3>
+        <div class="controls">
+            <label>\( x: <input type="number" id="xInput" value="0" step="0.1"> \)</label><br>
+            <label>\( \mu: <input type="number" id="meanInput" value="0" step="0.1"> \)</label><br>
+            <label>\( \sigma: <input type="number" id="sdInput" value="1" step="0.1"> \)</label>
+        </div>
+        <div class="area-display" id="zResult">\( z = 0.0000 \)</div>
 
-<div class="controls">
-    <label>\( z_1: <input type="number" id="z1Input" value="1" step="0.01"> \)</label>
-    <label id="z2Label" style="display:none;">\( z_2: <input type="number" id="z2Input" value="2" step="0.01"> \)</label>
-</div>
+        <h3>Probability Type</h3>
+        <div class="controls">
+            <label><input type="radio" name="probType" value="left" checked> Left of z</label><br>
+            <label><input type="radio" name="probType" value="right"> Right of z</label><br>
+            <label><input type="radio" name="probType" value="between"> Between z₁ & z₂</label>
+        </div>
 
-<div class="area-display" id="areaDisplay">\( P(X \le z) = 0.8413 \)</div>
-<canvas id="normalCanvas" width="600" height="300"></canvas>
+        <div class="controls">
+            <label>\( z_1: <input type="number" id="z1Input" value="1" step="0.01"> \)</label><br>
+            <label id="z2Label" style="display:none;">\( z_2: <input type="number" id="z2Input" value="2" step="0.01"> \)</label>
+        </div>
+        <div class="area-display" id="areaDisplay">\( P(X \le z) = 0.8413 \)</div>
+    </div>
+
+    <!-- Normal curve on the right -->
+    <div class="right-panel">
+        <h3>Normal Curve</h3>
+        <canvas id="normalCanvas" width="600" height="300"></canvas>
+    </div>
+
+</div>
 
 <footer>
     <p>&copy; 2026 Asma Alayeb</p>
@@ -154,13 +182,8 @@ const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
 
-function normalPDF(x) {
-    return (1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*x*x);
-}
-
-function normalCDF(z) {
-    return 0.5 * (1 + erf(z/Math.sqrt(2)));
-}
+function normalPDF(x) { return (1/Math.sqrt(2*Math.PI)) * Math.exp(-0.5*x*x); }
+function normalCDF(z) { return 0.5 * (1 + erf(z/Math.sqrt(2))); }
 
 function erf(x) {
     const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
@@ -171,7 +194,7 @@ function erf(x) {
     return sign*y;
 }
 
-function xToPixel(x) { return (x + 4)/8 * width; }
+function xToPixel(x) { return (x+4)/8 * width; }
 function yToPixel(y) { return height - y*height*1.5; }
 
 // Draw normal curve
@@ -238,7 +261,11 @@ function updateZ(){
     const mean = parseFloat(document.getElementById("meanInput").value);
     const sd = parseFloat(document.getElementById("sdInput").value);
 
-    if(sd===0){ document.getElementById("zResult").innerHTML="\\( \\sigma \\text{ cannot be 0} \\)"; MathJax.typesetPromise(); return; }
+    if(sd===0){ 
+        document.getElementById("zResult").innerHTML="\\( \\sigma \\text{ cannot be 0} \\)";
+        MathJax.typesetPromise(); 
+        return; 
+    }
 
     const z = (x-mean)/sd;
     document.getElementById("zResult").innerHTML = `\\( z = ${z.toFixed(4)} \\)`;
