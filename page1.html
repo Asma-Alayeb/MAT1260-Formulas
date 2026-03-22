@@ -6,9 +6,9 @@
 <title>MAT1260 Normal Distribution</title>
 <style>
     body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; color: #333; line-height: 1.8; }
+    header { background-color: #6a0dad; color: #fff; padding: 15px 0; text-align: center; border-bottom: 5px solid #b8860b; margin-bottom: 25px; }
     nav ul { list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; gap: 15px; }
     nav a { text-decoration: none; color: #6a0dad; font-weight: bold; }
-    header { background-color: #6a0dad; color: #fff; padding: 15px 0; text-align: center; border-bottom: 5px solid #b8860b; margin-bottom: 25px; }
     .content { max-width: 900px; margin: 0 auto; }
     canvas { border: 1px solid #ccc; margin-top: 20px; margin-bottom: 10px; }
     input[type="number"] { width: 60px; font-size: 16px; margin-left: 5px; }
@@ -18,29 +18,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
+
 <nav>
     <ul>
         <li><a href="index.html">Statistics Formulas</a></li>
-<li><a href="page1.html">Normal Distribution</a></li>
+        <li><a href="page1.html">Normal Distribution</a></li>
     </ul>
 </nav>
+
 <header>
-    <h1>Normal Distribution Interactive Curve</h1>
+    <h1>Interactive Normal Distribution Curve</h1>
 </header>
 
 <div class="content">
 <h3>Interactive Normal Curve</h3>
 
 <div class="controls">
-    <label>
-        <input type="radio" name="probType" value="left" checked> Left of z
-    </label>
-    <label>
-        <input type="radio" name="probType" value="right"> Right of z
-    </label>
-    <label>
-        <input type="radio" name="probType" value="between"> Between z1 & z2
-    </label>
+    <label><input type="radio" name="probType" value="left" checked> Left of z</label>
+    <label><input type="radio" name="probType" value="right"> Right of z</label>
+    <label><input type="radio" name="probType" value="between"> Between z1 & z2</label>
 </div>
 
 <div class="controls">
@@ -52,125 +48,67 @@
 <canvas id="normalCanvas" width="600" height="300"></canvas>
 
 <script>
-const canvas = document.getElementById("normalCanvas");
-const ctx = canvas.getContext("2d");
-const width = canvas.width;
-const height = canvas.height;
-
-// Standard normal PDF
-function normalPDF(x, mu=0, sigma=1) {
-    return (1/(sigma*Math.sqrt(2*Math.PI))) * Math.exp(-0.5*Math.pow((x-mu)/sigma,2));
-}
-
-// Standard normal CDF approximation
-function normalCDF(z) {
-    return 0.5 * (1 + erf(z/Math.sqrt(2)));
-}
-
-// Error function approximation
-function erf(x) {
-    const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
-    const sign = x>=0 ? 1 : -1;
-    x = Math.abs(x);
-    const t = 1/(1+p*x);
-    const y = 1 - (((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
-    return sign*y;
-}
+// Standard normal PDF & CDF
+function normalPDF(x, mu=0, sigma=1){ return (1/(sigma*Math.sqrt(2*Math.PI))) * Math.exp(-0.5*((x-mu)/sigma)**2); }
+function erf(x){ const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911; const sign=x>=0?1:-1; x=Math.abs(x); const t=1/(1+p*x); return sign*(1-((((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)))); }
+function normalCDF(z){ return 0.5*(1+erf(z/Math.sqrt(2))); }
 
 // Pixel conversion
-function xToPixel(x, minX=-4, maxX=4) { return (x - minX)/(maxX - minX) * width; }
-function yToPixel(y, scale=1.5) { return height - y*height*scale; }
+function xToPixel(x){ return (x+4)/8*canvas.width; }
+function yToPixel(y,scale=1.5){ return canvas.height - y*canvas.height*scale; }
 
-function drawNormal(probType, z1, z2=null) {
-    ctx.clearRect(0, 0, width, height);
-    const step = 0.01;
+const canvas=document.getElementById("normalCanvas");
+const ctx=canvas.getContext("2d");
+const z1Input=document.getElementById("z1Input");
+const z2Input=document.getElementById("z2Input");
+const z2Label=document.getElementById("z2Label");
+const radios=document.querySelectorAll('input[name="probType"]');
+const areaDisplay=document.getElementById("areaDisplay");
 
+function drawNormal(probType,z1,z2=null){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const step=0.01;
     // Axes
-    ctx.beginPath();
-    ctx.moveTo(0,height); ctx.lineTo(width,height);
-    ctx.moveTo(50,0); ctx.lineTo(50,height);
-    ctx.strokeStyle = "#333"; ctx.lineWidth = 2; ctx.stroke();
-
+    ctx.beginPath(); ctx.moveTo(0,canvas.height); ctx.lineTo(canvas.width,canvas.height);
+    ctx.moveTo(50,0); ctx.lineTo(50,canvas.height); ctx.strokeStyle="#333"; ctx.lineWidth=2; ctx.stroke();
     // Shaded area
-    ctx.beginPath();
-    ctx.moveTo(xToPixel(-4), height);
-    for(let x=-4; x<=4; x+=step){
-        const y = normalPDF(x);
-        let shade = false;
-        if(probType === 'left' && x <= z1) shade = true;
-        if(probType === 'right' && x >= z1) shade = true;
-        if(probType === 'between' && z2 !== null && x >= z1 && x <= z2) shade = true;
-        if(shade) ctx.lineTo(xToPixel(x), yToPixel(y));
-        else ctx.moveTo(xToPixel(x), yToPixel(y));
+    ctx.beginPath(); ctx.moveTo(xToPixel(-4),canvas.height);
+    for(let x=-4;x<=4;x+=step){
+        const y=normalPDF(x); let shade=false;
+        if(probType==='left' && x<=z1) shade=true;
+        if(probType==='right' && x>=z1) shade=true;
+        if(probType==='between' && z2!==null && x>=z1 && x<=z2) shade=true;
+        if(shade) ctx.lineTo(xToPixel(x),yToPixel(y));
+        else ctx.moveTo(xToPixel(x),yToPixel(y));
     }
-    ctx.lineTo(xToPixel(probType==='right'?4:probType==='between'?z2: z1), height);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(106,13,173,0.3)";
-    ctx.fill();
-
-    // Normal curve
+    ctx.lineTo(xToPixel(probType==='right'?4:probType==='between'?z2:z1),canvas.height);
+    ctx.closePath(); ctx.fillStyle="rgba(106,13,173,0.3)"; ctx.fill();
+    // Curve
     ctx.beginPath();
-    for(let x=-4; x<=4; x+=step){
-        const y = normalPDF(x);
-        const px = xToPixel(x);
-        const py = yToPixel(y);
-        if(x===-4) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-    }
-    ctx.strokeStyle = "#6a0dad"; ctx.lineWidth = 3; ctx.stroke();
-
+    for(let x=-4;x<=4;x+=step){ const y=normalPDF(x); const px=xToPixel(x); const py=yToPixel(y); if(x===-4) ctx.moveTo(px,py); else ctx.lineTo(px,py);}
+    ctx.strokeStyle="#6a0dad"; ctx.lineWidth=3; ctx.stroke();
     // z lines
-    ctx.strokeStyle = "blue"; ctx.lineWidth = 2;
-    ctx.fillStyle = "blue"; ctx.font="16px Arial"; ctx.textAlign="center";
-
-    if(probType !== 'between'){
-        ctx.beginPath();
-        ctx.moveTo(xToPixel(z1), height);
-        ctx.lineTo(xToPixel(z1), yToPixel(normalPDF(z1)));
-        ctx.stroke();
-        ctx.fillText("z = " + z1, xToPixel(z1), yToPixel(normalPDF(z1))-10);
-    } else {
-        ctx.beginPath();
-        ctx.moveTo(xToPixel(z1), height); ctx.lineTo(xToPixel(z1), yToPixel(normalPDF(z1))); ctx.stroke();
-        ctx.fillText("z1 = " + z1, xToPixel(z1), yToPixel(normalPDF(z1))-10);
-
-        ctx.beginPath();
-        ctx.moveTo(xToPixel(z2), height); ctx.lineTo(xToPixel(z2), yToPixel(normalPDF(z2))); ctx.stroke();
-        ctx.fillText("z2 = " + z2, xToPixel(z2), yToPixel(normalPDF(z2))-10);
-    }
-
-    // Area display
-    let area;
-    if(probType==='left') area = normalCDF(z1);
-    if(probType==='right') area = 1 - normalCDF(z1);
-    if(probType==='between') area = normalCDF(z2) - normalCDF(z1);
-    document.getElementById("areaDisplay").innerText = "P(X " + (probType==='left'? "≤":"≥") + " z) = " + area.toFixed(4);
+    ctx.strokeStyle="blue"; ctx.lineWidth=2; ctx.fillStyle="blue"; ctx.font="16px Arial"; ctx.textAlign="center";
+    if(probType!=='between'){ ctx.beginPath(); ctx.moveTo(xToPixel(z1),canvas.height); ctx.lineTo(xToPixel(z1),yToPixel(normalPDF(z1))); ctx.stroke(); ctx.fillText("z="+z1,xToPixel(z1),yToPixel(normalPDF(z1))-10);}
+    else{ ctx.beginPath(); ctx.moveTo(xToPixel(z1),canvas.height); ctx.lineTo(xToPixel(z1),yToPixel(normalPDF(z1))); ctx.stroke(); ctx.fillText("z1="+z1,xToPixel(z1),yToPixel(normalPDF(z1))-10);
+           ctx.beginPath(); ctx.moveTo(xToPixel(z2),canvas.height); ctx.lineTo(xToPixel(z2),yToPixel(normalPDF(z2))); ctx.stroke(); ctx.fillText("z2="+z2,xToPixel(z2),yToPixel(normalPDF(z2))-10);}
+    // area
+    let area=0;
+    if(probType==='left') area=normalCDF(z1);
+    if(probType==='right') area=1-normalCDF(z1);
+    if(probType==='between') area=normalCDF(z2)-normalCDF(z1);
+    areaDisplay.innerText="P(X "+(probType==='left'?"≤":probType==='right'?"≥":"between")+") = "+area.toFixed(4);
 }
 
-// Elements
-const z1Input = document.getElementById("z1Input");
-const z2Input = document.getElementById("z2Input");
-const z2Label = document.getElementById("z2Label");
-const radios = document.querySelectorAll('input[name="probType"]');
-
-function update() {
-    const probType = document.querySelector('input[name="probType"]:checked').value;
-    z2Label.style.display = (probType==='between') ? "inline" : "none";
-    const z1 = parseFloat(z1Input.value);
-    const z2 = probType==='between' ? parseFloat(z2Input.value) : null;
-    drawNormal(probType, z1, z2);
-}
-
-// Event listeners
-z1Input.addEventListener("input", update);
-z2Input.addEventListener("input", update);
-radios.forEach(r => r.addEventListener("change", update));
-
-// Initial draw
+function update(){ const probType=document.querySelector('input[name="probType"]:checked').value; z2Label.style.display=(probType==='between')?"inline":"none"; const z1=parseFloat(z1Input.value); const z2=probType==='between'?parseFloat(z2Input.value):null; drawNormal(probType,z1,z2);}
+z1Input.addEventListener("input",update);
+z2Input.addEventListener("input",update);
+radios.forEach(r=>r.addEventListener("change",update));
 update();
 </script>
 
 <footer style="text-align:center; margin-top: 30px; color:#555;">
-    <p>&copy; 2026 Asma Alayeb</p>
+<p>&copy; 2026 Asma Alayeb</p>
 </footer>
 </div>
 </body>
