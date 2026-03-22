@@ -87,18 +87,17 @@
 
 <h3>Find Probability Using z-score</h3>
 
-<!-- NEW SECTION (before curve) -->
+<!-- Probability type -->
 <div class="controls">
     <label><input type="radio" name="probType" value="left" checked> Left of z</label>
     <label><input type="radio" name="probType" value="right"> Right of z</label>
-    <label><input type="radio" name="probType" value="between"> Between z1 & z2</label>
+    <label><input type="radio" name="probType" value="between"> Between z₁ & z₂</label>
 </div>
 
+<!-- z-value inputs -->
 <div class="controls">
-    <label>z1: <input type="number" id="z1Input" value="1" step="0.01"></label>
-    <label id="z2Label" style="display:none;">
-        z2: <input type="number" id="z2Input" value="2" step="0.01">
-    </label>
+    <label>\( z_1: <input type="number" id="z1Input" value="1" step="0.01"> \)</label>
+    <label id="z2Label" style="display:none;">\( z_2: <input type="number" id="z2Input" value="2" step="0.01"> \)</label>
 </div>
 
 <div class="area-display" id="areaDisplay">P(X ≤ z) = 0.8413</div>
@@ -110,9 +109,9 @@
 <h3>Z-Score Calculator</h3>
 
 <div class="controls">
-    <label>x: <input type="number" id="xInput" value="0"></label>
-    <label>μ: <input type="number" id="meanInput" value="0"></label>
-    <label>σ: <input type="number" id="sdInput" value="1"></label>
+    <label>\( x: <input type="number" id="xInput" value="0"> \)</label>
+    <label>\( \mu: <input type="number" id="meanInput" value="0"> \)</label>
+    <label>\( \sigma: <input type="number" id="sdInput" value="1"> \)</label>
 </div>
 
 <div class="area-display" id="zResult">z = 0.0000</div>
@@ -152,7 +151,6 @@ function drawNormal(type, z1, z2) {
     if(type==='right'){ startX=z1; endX=4; }
     if(type==='between'){ startX=z1; endX=z2; }
 
-    // shading
     ctx.beginPath();
     ctx.moveTo(xToPixel(startX), height);
     for(let x=startX; x<=endX; x+=step){
@@ -163,7 +161,6 @@ function drawNormal(type, z1, z2) {
     ctx.fillStyle="rgba(106,13,173,0.3)";
     ctx.fill();
 
-    // curve
     ctx.beginPath();
     for(let x=-4; x<=4; x+=step){
         const y = normalPDF(x);
@@ -174,7 +171,6 @@ function drawNormal(type, z1, z2) {
     ctx.lineWidth=3;
     ctx.stroke();
 
-    // probability
     let area;
     if(type==='left') area = normalCDF(z1);
     if(type==='right') area = 1 - normalCDF(z1);
@@ -184,7 +180,6 @@ function drawNormal(type, z1, z2) {
         "P = " + area.toFixed(4);
 }
 
-// update graph
 function update() {
     const type = document.querySelector('input[name="probType"]:checked').value;
     document.getElementById("z2Label").style.display = (type==='between') ? "inline" : "none";
@@ -201,7 +196,6 @@ document.getElementById("z2Input").addEventListener("input", update);
 
 update();
 
-// Z-score calculator
 function updateZ() {
     const x = parseFloat(document.getElementById("xInput").value);
     const mean = parseFloat(document.getElementById("meanInput").value);
